@@ -11,24 +11,13 @@ class Scraper:
         soup = BeautifulSoup(data, 'lxml')
         title = soup.find('title').text
 
-        toReturn = title
+        toReturn = {title}
 
-        for div in soup.find_all('div'):
-            proceed = True
-            if 'id' in div and 'class' in div and div['id'].find('nav') == -1 and div['class'].find('nav') == -1:
-                pass
-            elif 'id' in div and div['id'].find('nav') == -1:
-                pass
-            elif 'class' in div and div['class'].find('nav') == -1:
-                pass
-            else:
-                proceed = False
-
-            if proceed:
-                for tag in div.find_all(['p', 'a']):
-                    words = tag.text.split(' ')
-                    for word in words:
-                        if len(word) > 4:
-                            toReturn = toReturn + ' ' + word
+        for div in soup.find('body').find_all(['main', 'div', 'section', 'p', 'a', 'span']):
+            words = div.text.split(' ')
+            for word in words:
+                FinalWord = ''.join(l for l in word if l.isalnum())
+                if len(FinalWord) > 4:
+                    toReturn.add(FinalWord)
 
         return toReturn
