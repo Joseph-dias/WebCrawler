@@ -1,6 +1,8 @@
 from Scraper import Scraper
+from TimeKeeper import TimeKeeper
 from collections import deque
 import re
+import time
 
 class Starter:
 
@@ -18,6 +20,17 @@ class Starter:
             url = input('Try Again: ')
         keyword = input('Search: ')
 
+        length = None
+        minutesGiven = False
+        while not minutesGiven:
+            mins = input('How many minutes to run: ')
+            try:
+                length = TimeKeeper(int(mins))
+                minutesGiven = True
+            except ValueError:
+                pass
+
+
         self.queuedLinks.add(url)
 
         print('')
@@ -27,12 +40,12 @@ class Starter:
         while keepCrawling:
             dataScraper = Scraper(url)
             dataScraper.scrape(keyword)
-            if dataScraper.isMatch:  # Add link to output if keyword found
+            if dataScraper.isMatch and url not in self.matching:  # Add link to output if keyword found
                 self.matching.add(url)
                 print(url)
             self.crawlPath.extend([u for u in dataScraper.foundUrls if u not in self.queuedLinks])
             self.queuedLinks.update(dataScraper.foundUrls)
-            if len(self.crawlPath) == 0:
+            if len(self.crawlPath) == 0 or length.hasPassed():
                 keepCrawling = False
             else:
                 url = self.crawlPath.popleft()

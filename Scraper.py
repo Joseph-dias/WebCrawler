@@ -19,6 +19,12 @@ class Scraper:
         soup = BeautifulSoup(data, 'lxml')
         title = soup.find('title')
 
+        splitWords = keyword.split(' ')
+        finalSplitWords = []
+
+        for w in splitWords:
+            finalSplitWords.append(''.join(l for l in w if l.isalnum()))
+
         pageWords = set()
 
         if title is not None:
@@ -39,7 +45,10 @@ class Scraper:
                     pageWords.add(FinalWord)
             pageWords.update(self.recurse(div))
 
-        self.isMatch = len([k for k in pageWords if keyword.lower() in k.lower()]) > 0
+        for sw in finalSplitWords:
+            self.isMatch = len([k for k in pageWords if sw.lower() in k.lower()]) > 0
+            if self.isMatch:
+                break
 
         for link in soup.find_all('a', attrs={'href' : True}):
             if link['href'].startswith('http'):
