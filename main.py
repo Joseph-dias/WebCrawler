@@ -1,5 +1,6 @@
 from Scraper import Scraper
 from collections import deque
+import re
 
 class Starter:
 
@@ -8,9 +9,16 @@ class Starter:
     crawlPath = deque()  # Queue of links to crawl over
 
     def Start(self):
+        pattern = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
+
         # Scraping first site
         url = input('Starter Site: ')
+        while not pattern.match(url):
+            print("INVALID SITE")
+            url = input('Try Again: ')
         keyword = input('Search: ')
+
+        self.queuedLinks.add(url)
 
         print('')
         print('Matches:')

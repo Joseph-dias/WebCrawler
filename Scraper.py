@@ -1,5 +1,9 @@
+import bs4
 from bs4 import BeautifulSoup
 import requests
+import warnings
+
+warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 class Scraper:
     TagsToScrape = ['main', 'div', 'section', 'p', 'a', 'span']
@@ -13,14 +17,19 @@ class Scraper:
     def scrape(self, keyword):
         data = requests.get(self.myUrl).text  # Pulling html text
         soup = BeautifulSoup(data, 'lxml')
-        title = soup.find('title').text
+        title = soup.find('title')
 
         pageWords = set()
 
-        titleWords = title.split(' ')
-        for word in titleWords:  # Splitting title words
-            theWord = ''.join(l for l in word if l.isalnum())
-            pageWords.add(theWord)
+        if title is not None:
+            title = title.text
+            titleWords = title.split(' ')
+            for word in titleWords:  # Splitting title words
+                theWord = ''.join(l for l in word if l.isalnum())
+                pageWords.add(theWord)
+
+        if soup.find('body') is None:
+            return
 
         for div in soup.find('body').find_all(self.TagsToScrape, recursive=False):
             words = div.text.split(' ')
@@ -32,8 +41,8 @@ class Scraper:
 
         self.isMatch = len([k for k in pageWords if keyword.lower() in k.lower()]) > 0
 
-        for link in soup.find_all('a'):
-            if 'http' in link['href']:
+        for link in soup.find_all('a', attrs={'href' : True}):
+            if link['href'].startswith('http'):
                 self.foundUrls.add(link['href'])
 
     def recurse(self, div):
