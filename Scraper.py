@@ -38,6 +38,8 @@ class Scraper:
             return
 
         for div in soup.find('body').find_all(self.TagsToScrape, recursive=False):
+            if div.name == 'header' or div.name == 'footer':  # Skip header and footer tags
+                continue
             try:
                 if div['href'].startswith('http'):
                     continue
@@ -63,6 +65,8 @@ class Scraper:
         toReturn = set()
 
         for myDiv in div.find_all(self.TagsToScrape, recursive=False):
+            if myDiv.name == 'header' or myDiv.name == 'footer':
+                continue
             try:
                 if myDiv['href'].startswith('http'):
                     continue

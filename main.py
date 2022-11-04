@@ -20,7 +20,14 @@ class Starter:
         while not pattern.match(url):
             print("INVALID SITE")
             url = input('Try Again: ')
+
         keyword = input('Search: ')
+        validSearch = len([s for s in keyword.split(' ') if len(''.join(l for l in s if l.isalnum())) < 4]) == 0
+        while not validSearch:
+            print('Invalid search.  Each word must be at least four characters.')
+            keyword = input('Try Again: ')
+            validSearch = len([s for s in keyword.split(' ') if len(''.join(l for l in s if l.isalnum())) < 4]) == 0
+
 
         length = None
         minutesGiven = False
