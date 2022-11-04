@@ -1,3 +1,5 @@
+import requests
+
 from Scraper import Scraper
 from TimeKeeper import TimeKeeper
 from collections import deque
@@ -38,13 +40,20 @@ class Starter:
 
         keepCrawling = True
         while keepCrawling:
-            dataScraper = Scraper(url)
-            dataScraper.scrape(keyword)
-            if dataScraper.isMatch and url not in self.matching:  # Add link to output if keyword found
-                self.matching.add(url)
-                print(url)
-            self.crawlPath.extend([u for u in dataScraper.foundUrls if u not in self.queuedLinks])
-            self.queuedLinks.update(dataScraper.foundUrls)
+            try:
+                dataScraper = Scraper(url)
+                dataScraper.scrape(keyword)
+                if dataScraper.isMatch and url not in self.matching:  # Add link to output if keyword found
+                    self.matching.add(url)
+                    print(url)
+                self.crawlPath.extend([u for u in dataScraper.foundUrls if u not in self.queuedLinks])
+                self.queuedLinks.update(dataScraper.foundUrls)
+            except requests.ConnectionError: # Catch exceptions about the requests and move on
+                pass
+            except requests.Timeout:
+                pass
+            except requests.RequestException:
+                pass
             if len(self.crawlPath) == 0 or length.hasPassed():
                 keepCrawling = False
             else:
@@ -53,7 +62,10 @@ class Starter:
             print('NOTHING FOUND')
 
 
-
-program = Starter()
-
-program.Start()
+try:
+    program = Starter()
+    program.Start()
+except KeyboardInterrupt:
+    print('')
+    print('')
+    print('You exited...')

@@ -15,7 +15,7 @@ class Scraper:
         self.myUrl = myurl
 
     def scrape(self, keyword):
-        data = requests.get(self.myUrl).text  # Pulling html text
+        data = requests.get(self.myUrl, timeout=5).text  # Pulling html text
         soup = BeautifulSoup(data, 'lxml')
         title = soup.find('title')
 
@@ -38,6 +38,11 @@ class Scraper:
             return
 
         for div in soup.find('body').find_all(self.TagsToScrape, recursive=False):
+            try:
+                if div['href'].startswith('http'):
+                    continue
+            except KeyError:
+                pass
             words = div.text.split(' ')
             for word in words:
                 FinalWord = ''.join(l for l in word if l.isalnum())
@@ -58,6 +63,11 @@ class Scraper:
         toReturn = set()
 
         for myDiv in div.find_all(self.TagsToScrape, recursive=False):
+            try:
+                if myDiv['href'].startswith('http'):
+                    continue
+            except KeyError:
+                pass
             words = myDiv.text.split(' ')
             for word in words:
                 FinalWord = ''.join(l for l in word if l.isalnum())
