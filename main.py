@@ -67,6 +67,9 @@ class Starter:
                 url = self.crawlPath.popleft()
         if len(self.matching) == 0:
             print('NOTHING FOUND')
+        else:
+            print('')
+            print('END OF RESULTS')
 
 
 try:
